@@ -1,0 +1,62 @@
+LOGISTIC REGRESSION ANALYSIS: STRATA AND CLUSTERS (ONE-STAGE)
+
+########################	SAS	ANALYSIS	
+
+data IceCream; 
+infile '/home/drignei/IceCream.txt';
+input Obs Grade Spending Group $ Study Alph fpc1 fpc2 Income Kids; 
+run; 
+
+   data StudentTotals; 
+      input Grade _TOTAL_;  
+      datalines; 
+   7 1824 
+   8 1025 
+   9 1151 
+   ;
+
+      data IceCream;  
+      set IceCream;  
+      if Grade=7 then Prob=20/1824; 
+      if Grade=8 then Prob=9/1025; 
+      if Grade=9 then Prob=11/1151; 
+      Weight=1/Prob;
+
+   proc surveylogistic data=IceCream total=StudentTotals; 
+	  cluster Study;
+      model Group = Income Kids Income*Kids /link=logit ; 
+      strata Grade;
+      weight Weight; 
+   run;
+
+  proc surveylogistic data=IceCream total=StudentTotals; 
+	  cluster Study;
+      model Group = Income Kids Income*Kids /link= probit ; 
+      strata Grade;
+      weight Weight; 
+   run;
+
+ 
+########################	R	ANALYSIS	
+
+library(survey) 
+IceCr<-read.table("IceCream.txt") 
+colnames(IceCr)=c("Obs","Grade","Spending","Group","Study","Alph","fpc1","fpc2","Income","Kids")
+attach(IceCr)
+
+pr<-1:40;
+pr[Grade==7]<-20/1824;
+pr[Grade==8]<- 9/1025;
+pr[Grade==9]<-11/1151;
+Wgt<-1/pr;
+
+fpc <-1:40;
+fpc[Grade==7]<-1824;
+fpc[Grade==8]<-1025;
+fpc[Grade==9]<-1151;
+
+dcs <- svydesign(id=~Study,  strata =~Grade, data=IceCr, weights=~Wgt,fpc=~fpc,nest=TRUE)
+summary(svyglm(I(Group == "less") ~ Income + Kids + Income * Kids, design = dcs, family=binomial(link = "logit"))) 
+summary(svyglm(I(Group == "less") ~ Income + Kids + Income * Kids, design = dcs, family=binomial(link = "probit"))) 
+
+

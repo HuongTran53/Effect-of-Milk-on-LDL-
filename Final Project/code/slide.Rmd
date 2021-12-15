@@ -1,0 +1,262 @@
+---
+title: "The effect of milk on LDL Cholesterol level"
+author: "Huong Tran"
+date: "11/26/2021"
+fontsize: 10pt
+output:
+  beamer_presentation:
+    theme: "Warsaw"
+    colortheme: "default"
+    fonttheme: "structurebold"
+    
+---
+
+## Objective:
+-  Low-density lipoprotein (LLD) cholesterol level is the main reason causing heart disease and heart attack.
+-  Consuming whole-fat dairy product can have unwanted health effect of increasing  LDL cholesterol level
+- This project identifies the affect of several types of milk on LDL cholesterol level.
+
+
+## Data Resource: 
+
+- From National Health and Nutrition Examination Survey (NHANES), year 2017 - 2018.
+- Population: 320,842,721
+- Sample size: 16,211
+- The screener response rate: 90.9%
+- 9,254 completed the interview and 8,704 were examined.
+
+
+
+## About Survey Design:
+The following components are used:
+
+- Questionnaire Data: we extract information about the choice of milk.
+- Laboratory Data:  the measure of LDL cholesterol (mg/dL) using  the standard Fredewald equation. 
+
+Note: triglyceride less than 400mg/dL.
+
+- Demographic: sample weight, PSUs, stratum information. 
+- Using "SEQN" to merge data.
+
+## About Survey Design: 
+- Selection of PSUs, which are counties: these PSUs were selected from strata defined by geography, metropolitan statistical area status, and various population demographics. Two PSUs were selected from most strata.
+
+    Note that if counties has the population of less than 5000, it will be combined with the adjacent counties to have the required number of population.
+-  Selection of segments within PSUs, that constitute a block/or group of blocks containing a cluster of households.
+-  Selection of specific households with segments, generally are city blocks.
+-  Selection of individual within household.
+
+## About Survey Design:
+
+\begin{center}
+  \includegraphics{/Users/huongtran/OU /Course Work/SES 3/STA5229/Final Project/result/pic_design.png}
+\end{center}
+
+## Demographics component:
+- Demographics: 
+    + SDMVSTRA: masked variance unit pseudo-stratum.
+    + SDMVPSU: massked variance unit psedo-PSU.
+    + WTMEC2YR: sampling weight.
+
+## Questionnaire component:
+
+- Questionnaire components:
+    + DBQ223A: You drink whole or regular milk.
+    + DBQ223B: You drink 2\% fat milk.
+    + DBQ223C: You drink 1\% fat milk. 
+    + DBQ223D: You drink fat free/skim milk.
+    + DBQ223E: You drink soy milk.
+    + DBQ223U: You drink another type of milk. 
+     
+     
+     
+## Laboratory component:
+- Laboratory Data: LBDLDL:  measure of LDL cholesterol (mg/dL) using  the standard Fredewald equation. 
+
+## Restriction: 
+- We are ignoring the requirement for triglyceride less than 400mg/dL in this project.
+
+- The cholesterol measure is valid for 12-year-older participants while the questionnaire for Diet and Behaviour are subjected for all participant. 
+
+
+```{r echo = F, message = F, warning = F}
+
+library(foreign)
+library(survey)
+library(dplyr)
+library(tidyr)
+library(survey)
+library(gridExtra)
+library(ggplot2)
+library(Hmisc)
+```
+
+
+```{r, echo=FALSE}
+milk <- read.xport("/Users/huongtran/OU /Course Work/SES 3/STA5229/Final Project/dataset/DBQ_J.xpt")
+choles <- read.xport("/Users/huongtran/OU /Course Work/SES 3/STA5229/Final Project/dataset/TRIGLY_J.xpt")
+demo <- read.xport("/Users/huongtran/OU /Course Work/SES 3/STA5229/Final Project/dataset/DEMO_J.xpt")
+
+# save as an R data frame
+saveRDS(milk, file="/Users/huongtran/OU /Course Work/SES 3/STA5229/Final Project/dataset/DEMO_I.rds")
+saveRDS(choles, file="/Users/huongtran/OU /Course Work/SES 3/STA5229/Final Project/dataset/TRIGLY_J.rds")
+saveRDS(demo, file="/Users/huongtran/OU /Course Work/SES 3/STA5229/Final Project/dataset/DEMO_J.rds")
+```
+
+
+```{r, echo= F}
+df <- left_join(select(demo, "SEQN", starts_with("SDMV"), "WTMEC2YR"), 
+                select(milk, "SEQN", starts_with("DBQ223")), by="SEQN") %>%
+  left_join(., select(choles, "SEQN", "LBDLDL") , by="SEQN")
+```
+ 
+
+ 
+
+## Data Exploratory: 
+
+\begin{center}
+  \includegraphics{/Users/huongtran/OU /Course Work/SES 3/STA5229/Final Project/result/df.png}
+\end{center}
+
+
+
+## Data Exploratory:
+- Some observations give answer in at least 2 types of milk:
+```{r}
+select(df, "DBQ223A", "DBQ223B", "DBQ223C", "LBDLDL")[21:23,]
+```
+
+
+## Data Exploratory:
+- Gather observations giving answer on at least 2 types of milk.
+- Create new varialbe called "Category": 
+
+```{r, echo = F}
+for (i in 1:nrow(df) ){
+  if (is.na(df$DBQ223A[i]) == T & is.na(df$DBQ223B[i]) == T & is.na(df$DBQ223C[i]) == T &
+      is.na(df$DBQ223D[i]) == T & is.na(df$DBQ223E[i]) == T & is.na(df$DBQ223U[i]) == T)  {
+    df$Category[i] = NA}
+  else {
+    t <- sum(df$DBQ223A[i], df$DBQ223B[i], df$DBQ223C[i], df$DBQ223D[i], df$DBQ223E[i], df$DBQ223U[i], na.rm = T)
+    if (t== 10) {
+      df$Category[i] <- "whole milk"
+    } else if ( t == 99) {
+      df$Category[i] <- "don't know"
+    } else if (t == 11) {
+      df$Category[i] <- "2% fat"
+    } else if (t == 12) {
+      df$Category[i] <- "1% fat" 
+    } else if (t == 13) {
+      df$Category[i] <- "fat free"
+    } else if (t == 14) {
+      df$Category[i] <- "soy milk"
+    } else if (t == 30) {
+      df$Category[i] <- "another"
+    } else {
+      df$Category[i] <- "2 types"
+    }
+  }
+}
+```
+
+
+```{r}
+as.matrix(unique(df$Category))
+```
+
+
+## Data Exploratory: 
+- Delete the others columns:
+```{r, size = "huge"}
+df <- select(df, - starts_with("DBQ223"))
+head(df)
+```
+
+## Survey Design:
+```{r}
+sv <- svydesign(id=~SDMVPSU,  strata =~SDMVSTRA, 
+                data=df, weights=~WTMEC2YR,nest=TRUE)
+
+deff(df$LBDLDL, cluster = df$SDMVPSU)
+```
+
+Which implies that our design is less precise than SRS.
+
+## About LDL Cholesterol:
+```{r}
+plot(svycdf(~LBDLDL, sv),
+     main= "Population of LDL Cholesterol level", col = "blue")
+```
+
+## About LDL Cholesterol:
+```{r, }
+svyplot(~LBDLDL, sv, basecol = "blue",
+        main = "Scatterplot for sampling weights")
+```
+
+## Survey Design:
+ - Consider the survey on sub-population for observations having their answer on a specific type of milk:
+```{r}
+sub.sv <- subset(sv, is.na(df$Category) == F & 
+                   df$Category != "2 types" & 
+                   df$Category != "don't know")
+```
+
+
+
+
+## Estimate of mean:
+```{r}
+svyboxplot(LBDLDL ~ Category, design = sub.sv,
+            main = "Boxplot of LDL Cholesterol level/each types of milk")
+
+```
+
+## Estimate of mean and confidence interval: 
+```{r}
+mean <- svyby(~LBDLDL,~Category, design =  sub.sv, 
+              svymean, na.rm = T)
+select(cbind(mean, confint(mean)), -"Category")
+```
+
+
+## Using Regression:
+```{r}
+model <- svyglm(LBDLDL ~ Category, design = sub.sv )
+s <- summary(model)$coefficients
+print(s, digits = 2)
+```
+
+## Whole milk and non-fat milk:
+Test the following hypothesis:
+$$H_0: \bar{y}_{10} = \bar{y}_{13}$$ 
+
+```{r}
+sub.sv2 <- subset(sv, df$Category == "whole milk" | 
+                    df$Category == "fat free")
+svyttest(LBDLDL~Category, sub.sv2) 
+```
+
+
+## Whole milk and non-fat milk:
+$$p-\text{value} = 0.7644 > 0.05$$ 
+Since the computed $p-value$ does not fall in the rejection region, we fail to reject $H_0$. There is insufficient evidence (at $\alpha = 0.05$)  of a difference between the true mean LDL Cholesterol between people who drink whole milk and people who drink fat free milk.
+
+## Further question:
+1.  The requirement of Fredewald equation?
+2.  Considering the effect of observations who drink at least 2 types of milk at the same time.
+
+## Reference:
+1. Sampling: Design and Analysis, Second Edition - Sharon Lohr.
+2. https://cran.r-project.org/web/packages/survey/survey.pdf
+3. https://wwwn.cdc.gov/nchs/nhanes/tutorials/default.aspx
+
+## 
+\begin{center}
+
+
+  \Huge {Thank you!}
+
+
+\end{center}

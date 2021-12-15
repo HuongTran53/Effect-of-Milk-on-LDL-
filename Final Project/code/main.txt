@@ -1,0 +1,97 @@
+###########################################################################
+##Packages
+###########################################################################
+
+
+library(foreign)
+library(survey)
+library(dplyr)
+library(tidyr)
+library(survey)
+library(gridExtra)
+library(ggplot2)
+library(Hmisc)
+###########################################################################
+## Import data from NHANES 2017 - 2018 
+###########################################################################
+
+milk <- read.xport("dataset/DBQ_J.xpt")
+choles <- read.xport("dataset/TRIGLY_J.xpt")
+demo <- read.xport("dataset/DEMO_J.xpt")
+
+# save as an R data frame
+saveRDS(milk, file="dataset/DEMO_I.rds")
+saveRDS(choles, file="dataset/TRIGLY_J.rds")
+saveRDS(demo, file="dataset/DEMO_J.rds")
+
+###########################################################################
+## Merging data: keep all records in DEMO, even though SEQN does not match 
+###########################################################################  
+
+df <- left_join(select(demo, "SEQN", starts_with("SDMV"), "WTMEC2YR"), select(milk, "SEQN", starts_with("DBQ223")), by="SEQN") %>%
+  left_join(., select(choles, "SEQN", "LBDLDL") , by="SEQN")
+
+#descrbie milk data:
+describe(select(df, "DBQ223A", "DBQ223B", "DBQ223C", "DBQ223D", "DBQ223E", "DBQ223U"))
+
+
+###########################################################################
+# Create survey design object:
+###########################################################################
+sv <- svydesign(id=~SDMVPSU,  strata =~SDMVSTRA, data=df, weights=~WTMEC2YR,nest=TRUE)
+
+
+###########################################################################
+#Ananlysis
+###########################################################################
+y.mean <- svymean(~LBDLDL, sv, na.rm = T)
+
+#estimate polulation cumulative distribution:
+plot(svycdf(~LBDLDL, sv))
+
+
+#Compare y.mean of each between each of milk-consumers:
+svA<- subset(sv, df["DBQ223A"] == 10)
+svB<- subset(sv, df["DBQ223B"] == 11 )
+svC<- subset(sv, df["DBQ223C"] == 12 )
+svD<- subset(sv, df["DBQ223D"] == 13)
+svE<- subset(sv, df["DBQ223E"] == 14 )
+svU<- subset(sv, df["DBQ223U"] == 30)
+
+y.mean.A <- svymean(~LBDLDL, svA, na.rm = T)
+ci.A <- confint(y.mean.A, level = 0.95)
+A <- data.frame(y.mean.A, ci.A)
+
+y.mean.B <- svymean(~LBDLDL, svB, na.rm = T)
+ci.B <- confint(y.mean.B, level = 0.95)
+B <- data.frame(y.mean.B, ci.B)
+
+y.mean.C <- svymean(~LBDLDL, svC, na.rm = T)
+ci.C <- confint(y.mean.C, level = 0.95)
+C <- data.frame(y.mean.C, ci.C)
+
+y.mean.D <- svymean(~LBDLDL, svD, na.rm = T)
+ci.D <- confint(y.mean.D, level = 0.95)
+D <- data.frame(y.mean.D, ci.D)
+
+y.mean.E <- svymean(~LBDLDL, svE, na.rm = T)
+ci.E <- confint(y.mean.E, level = 0.95)
+E <- data.frame(y.mean.E, ci.E)
+
+y.mean.U <- svymean(~LBDLDL, svU, na.rm = T)
+ci.U <- confint(y.mean.U, level = 0.95)
+U <- data.frame(y.mean.U, ci.U)
+
+result <- rbind(A, B, C, D, E, U)
+rownames(result) <- c("whole milk", "2% fat milk", "1% fat milk", "fat free/skim milk", "soy milk", "another type")
+
+###########################################################################
+#Comparison between people who drinks soy milk and whole milk
+###########################################################################
+
+
+
+
+
+
+

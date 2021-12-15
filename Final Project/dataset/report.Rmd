@@ -1,0 +1,63 @@
+---
+title: "Milk and LDL Cholesterol level"
+author: "Huong Tran"
+date: "11/17/2021"
+output: html_document
+output: pdf_document 
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(knitr)
+#library(ggplot2)
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_knit$set(root.dir= normalizePath('..'))
+knitr::opts_chunk$set(error = FALSE)
+library(yaml)
+```
+
+# Abstract:  
+## Objective:  
+Consuming whole-fat dairy products might cause the increase in low-density lipoprotein (LDL) cholesterol level, which cause heart disease and heart attack.
+This project identifies the affect of milk on LDL cholesterol level. The comparison in LDL cholesterol level on milk-consumers will be derived. 
+## Data overviews:
+The data used to produce insights of the difference between several types of milk in this report is extracted from National Health and Nutrition Examination Survey (NHANES) 2017 - 2018. The following components are used:
+
+    1. Questionnaire Data: from component Diet and Behaviour, we extract for the choice of milk. The following variables are used:
+     
+         - DBQ223A: You drink whole or regular milk.
+         - DBQ223B: You drink 2\% fat milk.
+         - DBQ223C: You drink 1\% fat milk.
+         - DBQ223D: You drink fat free/skim milk.
+         - DBQ223E: You drink soy milk.
+         - DBQ223U: You drink another type of milk. 
+     
+    2. Laboratory Data: In this project, we are interested in the measure of LDL cholesterol (mg/dL) using  the standard Fredewald equation, which is stored in the variable LBDLDL. Please note that, we are ignoring the requirement for triglyceride less than 400mg/dL in this project.
+
+Note that, the cholesterol measure is valid for 12-year-older participants while the questionnaire for Diet and Behaviour are subjected for all participant. 
+Therefore, weights of sample should be taken into account carefully:
+    3. Demographics: 
+    Because NHANES uses complex surveys designs, sample weights should be taken into account carefully: 
+
+    - Selection of PSUs, which are counties.
+    Note that if counties has the population of less than 5000, it will be combined with the adjacent counties to have the required number of population.
+    - Selection of segments within PSUs, that constitute a block/or group of blocks containing a cluster of households.
+   - Selection of specific households with segments.
+    - Selection of individual within household.
+
+   Data for cholesterol level were collected in the MEC exam, therefore variable WTMEC2YR (Full sample 2 year MEC exam weight) must be used. 
+
+
+## Methods: 
+To observe the effect of various types of milk on consumers, we stratify the population based on the type of milk they are drinking. 
+
+## Data Exploratory: 
+
+Some summary about LDL Cholesterol:
+
+```{r}
+df <- df.join[myvars]
+summary(df$LBDLDL)
+
+```

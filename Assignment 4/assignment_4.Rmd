@@ -1,0 +1,46 @@
+---
+title: "Assignment 4"
+author: "Huong Tran"
+date: "11/24/2021"
+output: pdf_document
+---
+```{r}
+data <- read.table("cap3.txt", header = T)
+attach(data)
+n <- nrow(data)
+library(survey)
+```
+1. Compute an estimate of population mean for variable "growth" along with the standard error.
+
+```{r}
+fpc <- 1:n
+fpc[stype == 'E'] <- 4421
+fpc[stype == 'M'] <- 1018
+fpc[stype == 'H'] <- 755 
+
+sv <- svydesign(id=~ dnum, strata = stype, data = data, fpc =~ fpc, nest = TRUE)
+svymean(~growth, sv)
+```
+
+b. Regression analysis to assess if there is a linear relationship between the "growth" and "awards, "meal" and "colgrad".
+```{r}
+summary(svyglm(growth ~ awards + meals + colgrad, design = sv))
+```
+Based on P-value, we conclude that eligibility for awards and the percentage of students eligible for subsidized meals can help predict the change in academic performacne index from 1999 to 2000.
+c. 
+
+```{r}
+summary(svyglm(I(grsign == 1) ~awards + meals + colgrad , design = sv, family=binomial(link = "logit"))) 
+```
+Using p-value, we conclude that there is relationship between the eligibility for award and "grsign".
+
+d. 
+```{r}
+svytable(~grsign + awards, sv)
+
+```
+```{r}
+svychisq(~grsign + awards, sv,statistic = "Wald")
+```
+
+Using Wald test, we obtain small p-value, which indicate the relationship between "grsign" and "awards", and this result agrees with the conclusion in part c. 

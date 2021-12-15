@@ -1,0 +1,223 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\title{Report}
+\author{Huong Tran}
+\date{11/24/2021}
+
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  pdftitle={Report},
+  pdfauthor={Huong Tran},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+
+\begin{document}
+\maketitle
+
+\documentclass[11pt]{article}
+%\usepackage[portuguese]{babel}
+\usepackage{natbib}
+\usepackage{url}
+%\usepackage[utf8x]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\graphicspath{{images/}}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{vmargin}
+\setmarginsrb{3 cm}{2.5 cm}{3 cm}{2.5 cm}{1 cm}{1.5 cm}{1 cm}{1.5 cm}
+
+\title{Milk and LDL Cholesterol level}                              % Title
+\author{Huong Tran}                             % Author
+\date{\today}                                           % Date
+
+\makeatletter
+\let\thetitle\@title
+\let\theauthor\@author
+\let\thedate\@date
+\makeatother
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\@author}
+\lhead{\@title}
+\cfoot{\thepage}
+
+e\}
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{titlepage}
+    \centering
+    \vspace*{0.5 cm}
+   % \includegraphics[scale = 0.75]{logo.png}\\[1.0 cm] % University Logo
+    \textsc{\LARGE \newline\newline Oakland University }\\[0.5 cm]  % University Name
+    \textsc{\Large Department of Mathematics and Statistics}\\[0.5 cm]  
+    \textsc{STA5229: Stat method in Sample Survey}
+    \rule{\linewidth}{0.2 mm} \\[0.4 cm]
+    { \huge \bfseries \@title} \\
+    
+    \rule{\linewidth}{0.2 mm} \\[1.5 cm]
+    
+    \begin{minipage}{0.5\textwidth}
+        \begin{flushleft} \large
+            \emph{Professor: Dorin Drignei}\\
+            \end{flushleft}
+            \end{minipage}~
+            \begin{minipage}{0.4\textwidth}
+            
+            \begin{flushright} \large
+            \emph{Student: Huong Tran  } \\
+        \end{flushright}
+        
+    \end{minipage}\\[2 cm]
+    
+    
+    \@date
+    
+
+    
+    
+\end{titlepage}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\tableofcontents
+\pagebreak
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Abstract:  }
+\subsection{Objective: } Consuming whole-fat dairy products might cause the increase in low-density lipoprotein (LDL) cholesterol level, which cause heart disease and heart attack.
+This project identifies the affect of several types of milk on LDL cholesterol level. The comparison in LDL cholesterol level on milk-consumers will be derived. 
+\subsection{Data overviews: } The data used to produce insights of the difference between several types of milk in this report is extracted from National Health and Nutrition Examination Survey (NHANES) 2017 - 2018. The following components are used:
+\begin{itemize}
+    \item Questionnaire Data: from component Diet and Behaviour, we extract information about the choice of milk. The following variables are used:
+     \begin{itemize}
+         \item DBQ223A: You drink whole or regular milk.
+         \item DBQ223B: You drink 2\% fat milk.
+         \item DBQ223C: You drink 1\% fat milk.
+         \item DBQ223D: You drink fat free/skim milk.
+         \item DBQ223E: You drink soy milk.
+         \item DBQ223U: You drink another type of milk. 
+     \end{itemize}
+    \item Laboratory Data: In this project, we are interested in the measure of LDL cholesterol (mg/dL) using  the standard Fredewald equation, which is stored in the variable LBDLDL. Please note that, we are ignoring the requirement for triglyceride less than 400mg/dL in this project.
+
+Note that, the cholesterol measure is valid for 12-year-older participants while the questionnaire for Diet and Behaviour are subjected for all participant. 
+Therefore, weights of sample should be taken into account carefully.
+    \item Demographics: 
+    Because NHANES uses complex surveys designs, sample weights should be taken into account carefully: 
+\begin{enumerate}
+    \item Selection of PSUs, which are counties.
+    Note that if counties has the population of less than 5000, it will be combined with the adjacent counties to have the required number of population.
+    \item  Selection of segments within PSUs, that constitute a block/or group of blocks containing a cluster of households.
+    \item  Selection of specific households with segments.
+    \item Selection of individual within household.
+\end{enumerate}
+   Data for cholesterol level were collected in the MEC exam, therefore variable WTMEC2YR (Full sample 2 year MEC exam weight) must be used. 
+\end{itemize}
+
+\subsection{Methods: }
+To observe the effect of various types of milk on consumers, we stratify the population based on the type of milk they are drinking. 
+\section{Data exploratory: }
+First,  we download data from NHANES website: 
+\begin{verbatim}
+    milk <- read.xport("dataset/DBQ_J.xpt")
+    choles <- read.xport("dataset/TRIGLY_J.xpt")
+    w <- read.xport("dataset/DEMO_J.xpt")
+
+    # save as an R data frame
+    saveRDS(milk, file="dataset/DEMO_I.rds")
+    saveRDS(choles, file="dataset/TRIGLY_J.rds")
+    saveRDS(w, file="dataset/DEMO_J.rds")
+\end{verbatim}
+
+In NHANES data, the unique identifier for each sample person is known as the sequence number (SEQN). Using SEQN, we are able to merge the three dataframes:
+\begin{verbatim}
+    df.tem <- merge(w, milk, by.x = "SEQN", by.y = "SEQN")
+    df.join <- merge(df.tem, choles, by.x = "SEQN", by.y = "SEQN")
+    myvars <- c("SEQN","DBQ223A", "DBQ223B", "DBQ223C", "DBQ223D", 
+            "DBQ223E", "DBQ223U", "LBDLDL", "WTMEC2YR")
+    df <- df.join[myvars]
+\end{verbatim}
+Some statistics of LDL Cholesterol:
+\begin{verbatim}
+    summary(df$LBDLDL)
+\end{verbatim}
+The result is as follow:
+\begin{center}
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+   Min. &1st Qu. &  Median &    Mean &3rd Qu. &    Max. &    NA's \\
+   \hline
+   18.0  &  82.0  & 103.0  & 106.9   & 128.0   & 357.0   &  228  \\
+   \hline
+\end{tabular}
+\end{center}
+\section{Comparison between the types of milk: }
+\section{Further question: }
+\newpage
+\bibliographystyle{plain}
+\bibliography{biblist}
+ 
+\end{document}
+
+\end{document}
